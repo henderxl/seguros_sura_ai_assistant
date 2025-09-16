@@ -1,0 +1,23 @@
+# Production Dependencies (extends local.txt)
+-r local.txt
+
+# Production Monitoring
+azure-monitor-opentelemetry==1.2.0
+opencensus-ext-azure==1.1.13
+prometheus-client==0.19.0
+
+# Production Security
+cryptography==41.0.8
+azure-keyvault-secrets==4.7.0
+
+# Production Storage
+azure-storage-blob==12.19.0
+azure-cosmos==4.5.1
+
+# Production Scaling
+gunicorn==21.2.0
+uvicorn[standard]==0.25.0
+
+# Production Utilities
+redis==5.0.1
+celery==5.3.4

@@ -1,0 +1,79 @@
+# Docker Compose para desarrollo local del Sistema de Agentes Seguros Sura
+version: '3.8'
+
+services:
+  # API de Expedición (Puerto 8000)
+  expedition-api:
+    build:
+      context: ./services/expedition_api
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - FLASK_ENV=development
+      - FLASK_DEBUG=True
+    volumes:
+      - ./services/expedition_api/polizas:/app/polizas
+    networks:
+      - sura-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+  
+  # Interfaz Cliente (Puerto 8501)
+  client-interface:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.client
+    ports:
+      - "8501:8501"
+    environment:
+      - AZURE_OPENAI_API_KEY=${AZURE_OPENAI_API_KEY}
+      - EXPEDITION_API_URL=http://expedition-api:8000
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+    depends_on:
+      - expedition-api
+    networks:
+      - sura-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8501/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+  
+  # Interfaz Asesor (Puerto 8502)
+  advisor-interface:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.advisor
+    ports:
+      - "8502:8502"
+    environment:
+      - AZURE_OPENAI_API_KEY=${AZURE_OPENAI_API_KEY}
+      - EXPEDITION_API_URL=http://expedition-api:8000
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+    depends_on:
+      - expedition-api
+    networks:
+      - sura-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8502/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+networks:
+  sura-network:
+    driver: bridge
+
+volumes:
+  sura-data:
+    driver: local
+  sura-logs:
+    driver: local

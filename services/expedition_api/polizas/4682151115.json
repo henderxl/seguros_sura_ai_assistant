@@ -1,0 +1,14 @@
+{
+  "identificacion_tomador": "123456789",
+  "celular_tomador": "3001234567",
+  "marca_vehiculo": "Renault",
+  "modelo_vehiculo": "2015",
+  "linea_vehiculo": "EXPRESSION - MT 1600CC AA",
+  "clase_vehiculo": "Automóvil",
+  "color_vehiculo": "Blanco",
+  "plan_poliza": "Plan Basico",
+  "valor_total_poliza": "607500",
+  "valor_mensual": "50625",
+  "numero_poliza": "4682151115",
+  "fecha_emision": "2025-09-15T06:13:32.142085Z"
+}

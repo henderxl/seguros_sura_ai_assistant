@@ -1,0 +1,115 @@
+# ========================================
+# GITIGNORE SEGUROS SURA AI - Septiembre 2025
+# ========================================
+
+# Python Cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.pyc
+*.pyo
+*.pyd
+
+# Entorno Virtual
+venv/
+.venv/
+env/
+ENV/
+Scripts/
+Lib/site-packages/
+Include/
+share/
+pyvenv.cfg
+
+# Variables de Entorno Sensibles
+.env
+.env.local
+.env.production
+.env.staging
+.env.development
+
+# Bases de Datos Runtime
+data/sessions/*.db
+data/sessions/conversations.db
+*.sqlite3
+
+# Vector Store
+data/vectors/chroma_db/
+data/vectors/*/
+
+# Logs 
+logs/
+logs/*.log
+*.log
+
+# Archivos Temporales del Sistema
+*.tmp
+*.temp
+temp_*
+tmp_*
+
+# IDEs y Editores
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.spyderproject
+.spyproject
+
+# Sistema Operativo
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# Testing y Coverage
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+
+# Build y Distribution
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Jupyter Notebooks
+.ipynb_checkpoints
+
+# Documentos de trabajo personal
+*_personal*
+*_backup*
+*_temp*
+draft_*
+
+# Archivos temporales de Excel/Office
+~$*.xlsx
+~$*.xls
+~$*.docx
+~$*.doc
+~$*.pptx
+~$*.ppt

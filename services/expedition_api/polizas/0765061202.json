@@ -1,0 +1,14 @@
+{
+  "identificacion_tomador": "123456789",
+  "celular_tomador": "3001234567",
+  "marca_vehiculo": "CHEVROLET",
+  "modelo_vehiculo": "2015",
+  "linea_vehiculo": "LS - MT 1800CC",
+  "clase_vehiculo": "CAMIONETA PASAJ.",
+  "color_vehiculo": "Blanco",
+  "plan_poliza": "Plan Autos Global",
+  "valor_total_poliza": "2115000",
+  "valor_mensual": "176250",
+  "numero_poliza": "0765061202",
+  "fecha_emision": "2025-09-16T19:07:50.469388Z"
+}
