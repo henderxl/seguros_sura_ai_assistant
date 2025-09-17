@@ -11,10 +11,12 @@ Solución integral basada en inteligencia artificial con arquitectura multiagén
 **✅ Documentación Nivel Enterprise** - Guías técnicas completas y profesionales  
 **✅ Ready for Production Deployment** - Calidad empresarial demostrada  
 **✅ UI Moderna Corporativa** - Diseño visual con paleta oficial Seguros Sura  
+**✅ Setup Automatizado** - Instalación completa con `python setup.py`
 
 > 📊 **Documentación Técnica Completa:** [`docs/`](docs/)  
 > 🚀 **Guía de Despliegue:** [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md)  
-> 📋 **15 Casos de Uso Validados:** [`docs/USE_CASES.md`](docs/USE_CASES.md)
+> 📋 **15 Casos de Uso Validados:** [`docs/USE_CASES.md`](docs/USE_CASES.md)  
+> ⚡ **Quick Start:** `python setup.py` → `python run_client.py`
 
 ---
 
@@ -122,12 +124,61 @@ El sistema implementa **4 agentes especializados** con capacidades empresariales
 - 2GB RAM mínimo
 - 1GB espacio en disco
 
-### **Instalación Paso a Paso**
+### **🚀 Instalación Automatizada (RECOMENDADO)**
 
-1. **Clonar y preparar entorno**:
+**Método más fácil y robusto para configurar todo automáticamente:**
+
+1. **Clonar repositorio**:
 ```bash
 git clone [repository-url]
 cd seguros_sura_ai_assistant
+```
+
+2. **Ejecutar setup automático**:
+```bash
+python setup.py
+```
+
+El script de setup automáticamente:
+- ✅ Crea y configura el entorno virtual
+- ✅ Instala todas las dependencias necesarias
+- ✅ Configura directorios del sistema
+- ✅ Crea archivo `.env` desde ejemplo
+- ✅ Verifica que todo funcione correctamente
+
+Deberías ver al final:
+```
+🎉 SETUP COMPLETADO
+============================================================
+📋 PRÓXIMOS PASOS:
+
+1. Configurar API Key:
+   - Edita el archivo .env
+   - Agrega tu OPENAI_API_KEY válida
+
+2. Iniciar el sistema:
+   - Cliente: python run_client.py
+   - Asesor:  python run_advisor.py
+```
+
+3. **Configurar API Key**:
+Editar `.env` con tus credenciales: (Se envían datos al correo para probar)
+```env
+# Azure OpenAI Configuration
+AZURE_OPENAI_API_KEY=tu_api_key_aqui
+AZURE_OPENAI_ENDPOINT=https://tu-endpoint.openai.azure.com/
+AZURE_OPENAI_API_VERSION=2025-01-01-preview
+AZURE_OPENAI_CHAT_DEPLOYMENT=gpt-4o
+AZURE_OPENAI_EMBEDDING_DEPLOYMENT=text-embedding-ada-002
+```
+
+### **⚙️ Instalación Manual (Solo si falla el automático)**
+
+<details>
+<summary>Método paso a paso tradicional</summary>
+
+1. **Preparar entorno virtual**:
+```bash
 python -m venv venv
 venv\Scripts\activate  # Windows
 # source venv/bin/activate  # Linux/Mac
@@ -140,20 +191,22 @@ pip install -r requirements/local.txt
 
 3. **Configurar variables de entorno**:
 ```bash
-cp env.example .env
+copy env.example .env  # Windows
+# cp env.example .env  # Linux/Mac
 ```
 
-Editar `.env` con tus credenciales: (Se envían datos al correo para probar)
-```env
-# Azure OpenAI Configuration
-AZURE_OPENAI_API_KEY=tu_api_key_aqui
-AZURE_OPENAI_ENDPOINT=https://tu-endpoint.openai.azure.com/
-AZURE_OPENAI_API_VERSION=2025-01-01-preview
-AZURE_OPENAI_CHAT_DEPLOYMENT=gpt-4o
-AZURE_OPENAI_EMBEDDING_DEPLOYMENT=text-embedding-ada-002
+4. **Crear directorios necesarios**:
+```bash
+mkdir -p data/sessions data/vectors data/vehicles data/documents data/images logs
+mkdir -p services/expedition_api/polizas
 ```
 
-4. **Validar instalación**:
+</details>
+
+### **🧪 Validación de Instalación**
+
+Una vez completada la instalación (automática o manual):
+
 ```bash
 python test_system.py
 ```
@@ -209,8 +262,8 @@ python app.py
 
 **"Error: No module found" o "Error instalando dependencias"**
 ```bash
-# Opción 1: Script de instalación inteligente (RECOMENDADO)
-python install_dependencies.py
+# Opción 1: Setup automático robusto (RECOMENDADO)
+python setup.py
 
 # Opción 2: Instalación manual
 venv\Scripts\activate  # Windows
@@ -221,8 +274,18 @@ pip install -r requirements/local.txt
 
 **"Error con pandas/numpy en Python 3.13"**
 ```bash
-# Usar script de instalación que maneja estas incompatibilidades
-python install_dependencies.py
+# El setup automático maneja estas incompatibilidades
+python setup.py
+```
+
+**"Error: AZURE_OPENAI_API_KEY es requerida"**
+```bash
+# Verificar que existe el archivo .env
+ls -la .env  # Linux/Mac
+dir .env     # Windows
+
+# Si no existe, ejecutar setup para crearlo
+python setup.py
 ```
 
 **"Error de sincronización entre cliente y asesor"**
