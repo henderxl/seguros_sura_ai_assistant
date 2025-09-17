@@ -28,21 +28,22 @@ def check_python_version():
     return True
 
 def setup_virtual_environment():
-    """Configura entorno virtual si no existe"""
+    """Configura entorno virtual si no existe (opcional)"""
     venv_path = Path("venv")
     
     if venv_path.exists():
         print("✅ Entorno virtual ya existe")
         return True
     
-    print("🔧 Creando entorno virtual...")
+    print("🔧 Creando entorno virtual (opcional)...")
     try:
         subprocess.run([sys.executable, "-m", "venv", "venv"], check=True)
         print("✅ Entorno virtual creado")
         return True
     except subprocess.CalledProcessError as e:
-        print(f"❌ Error creando entorno virtual: {e}")
-        return False
+        print(f"⚠️  No se pudo crear entorno virtual: {e}")
+        print("💡 Continuando sin entorno virtual (usando Python del sistema)")
+        return True  # No es crítico para el funcionamiento
 
 def install_dependencies():
     """Instala dependencias del requirements (solo si es necesario)"""
@@ -55,17 +56,9 @@ def install_dependencies():
     # Verificar si las dependencias ya están instaladas
     print("🔍 Verificando dependencias existentes...")
     
-    # Determinar comando pip
-    if os.name == 'nt':  # Windows
-        pip_cmd = ["venv\\Scripts\\pip"]
-    else:  # Unix/Linux/Mac
-        pip_cmd = ["venv/bin/pip"]
-    
-    # Verificar paquetes críticos usando python directo del venv
-    if os.name == 'nt':  # Windows
-        python_cmd = ["venv\\Scripts\\python"]
-    else:  # Unix/Linux/Mac
-        python_cmd = ["venv/bin/python"]
+    # Usar pip del sistema actual (no del venv) para mayor compatibilidad
+    pip_cmd = [sys.executable, "-m", "pip"]
+    python_cmd = [sys.executable]
     
     critical_packages = ["langchain", "openai", "streamlit", "chromadb"]
     missing_packages = []
@@ -81,27 +74,70 @@ def install_dependencies():
             )
             if result.returncode != 0:
                 missing_packages.append(package)
+                print(f"   ❌ {package} - No disponible")
+            else:
+                print(f"   ✅ {package} - OK")
         except:
             missing_packages.append(package)
+            print(f"   ❌ {package} - Error verificando")
     
     if not missing_packages:
-        print("✅ Dependencias ya están instaladas y funcionando")
+        print("✅ Todas las dependencias críticas están instaladas")
         return True
     
     print(f"📦 Faltan dependencias: {', '.join(missing_packages)}")
     print("📦 Instalando dependencias faltantes...")
     
+    # Intentar instalar con diferentes estrategias
+    installation_success = False
+    
+    # Estrategia 1: Instalar desde requirements
     try:
-        # Solo instalar si faltan dependencias
-        subprocess.run(pip_cmd + ["install", "-r", str(requirements_file)], check=True)
-        
-        print("✅ Dependencias instaladas")
-        return True
+        print("   🔄 Intentando instalar desde requirements/local.txt...")
+        result = subprocess.run(
+            pip_cmd + ["install", "-r", str(requirements_file)], 
+            check=True,
+            capture_output=True,
+            text=True
+        )
+        print("✅ Dependencias instaladas desde requirements")
+        installation_success = True
     except (subprocess.CalledProcessError, PermissionError, OSError) as e:
-        print(f"⚠️  Error instalando dependencias: {e}")
-        print("💡 Verificando si las dependencias están disponibles de otra manera...")
+        print(f"   ⚠️  Error con requirements: {e}")
         
-        # En caso de error, verificar si las dependencias críticas están disponibles
+        # Estrategia 2: Instalar paquetes individualmente
+        try:
+            print("   🔄 Intentando instalar paquetes individualmente...")
+            for package in missing_packages:
+                print(f"   📦 Instalando {package}...")
+                result = subprocess.run(
+                    pip_cmd + ["install", package], 
+                    check=True,
+                    capture_output=True,
+                    text=True
+                )
+                print(f"   ✅ {package} instalado")
+            installation_success = True
+        except (subprocess.CalledProcessError, PermissionError, OSError) as e:
+            print(f"   ⚠️  Error instalando individualmente: {e}")
+            
+            # Estrategia 3: Instalar con --user
+            try:
+                print("   🔄 Intentando instalar con --user...")
+                result = subprocess.run(
+                    pip_cmd + ["install", "--user", "-r", str(requirements_file)], 
+                    check=True,
+                    capture_output=True,
+                    text=True
+                )
+                print("✅ Dependencias instaladas con --user")
+                installation_success = True
+            except (subprocess.CalledProcessError, PermissionError, OSError) as e:
+                print(f"   ⚠️  Error con --user: {e}")
+    
+    # Verificar si la instalación fue exitosa
+    if installation_success:
+        print("🔍 Verificando instalación...")
         still_missing = []
         available = []
         
@@ -121,7 +157,8 @@ def install_dependencies():
                 still_missing.append(package)
         
         print(f"✅ Disponibles: {', '.join(available) if available else 'ninguno'}")
-        print(f"❌ Faltantes: {', '.join(still_missing) if still_missing else 'ninguno'}")
+        if still_missing:
+            print(f"❌ Aún faltantes: {', '.join(still_missing)}")
         
         if not still_missing:
             print("✅ Todas las dependencias críticas están disponibles")
@@ -135,6 +172,70 @@ def install_dependencies():
             print(f"❌ Faltan demasiadas dependencias críticas: {', '.join(still_missing)}")
             print("💡 Instala manualmente: pip install -r requirements/local.txt")
             return False
+    else:
+        print("❌ No se pudieron instalar las dependencias")
+        print("💡 Instala manualmente: pip install -r requirements/local.txt")
+        return False
+
+def install_problematic_packages():
+    """Instala paquetes que pueden causar problemas de manera específica"""
+    print("🔧 Instalando paquetes problemáticos...")
+    
+    # Paquetes que pueden necesitar instalación especial
+    problematic_packages = {
+        "chromadb": "chromadb>=0.4.0",
+        "streamlit": "streamlit>=1.29.0",
+        "langchain": "langchain>=0.1.0"
+    }
+    
+    pip_cmd = [sys.executable, "-m", "pip"]
+    
+    for package_name, package_spec in problematic_packages.items():
+        try:
+            # Verificar si ya está instalado
+            result = subprocess.run(
+                [sys.executable, "-c", f"import {package_name}; print('OK')"], 
+                capture_output=True, 
+                text=True, 
+                check=False
+            )
+            
+            if result.returncode == 0:
+                print(f"   ✅ {package_name} - Ya instalado")
+                continue
+            
+            print(f"   📦 Instalando {package_name}...")
+            
+            # Intentar diferentes estrategias de instalación
+            strategies = [
+                [package_spec],  # Instalación normal
+                [package_spec, "--no-cache-dir"],  # Sin caché
+                [package_spec, "--user"],  # Para usuario
+                [package_spec, "--upgrade", "--force-reinstall"]  # Forzar reinstalación
+            ]
+            
+            installed = False
+            for strategy in strategies:
+                try:
+                    subprocess.run(
+                        pip_cmd + ["install"] + strategy,
+                        check=True,
+                        capture_output=True,
+                        text=True
+                    )
+                    print(f"   ✅ {package_name} instalado con estrategia: {' '.join(strategy)}")
+                    installed = True
+                    break
+                except subprocess.CalledProcessError:
+                    continue
+            
+            if not installed:
+                print(f"   ❌ No se pudo instalar {package_name}")
+                
+        except Exception as e:
+            print(f"   ❌ Error con {package_name}: {e}")
+    
+    return True
 
 def setup_directories():
     """Crea directorios necesarios"""
@@ -190,49 +291,6 @@ EXPEDITION_API_URL=http://localhost:8000
         print("⚠️  IMPORTANTE: Edita .env y agrega tu OPENAI_API_KEY")
         return True
 
-def copy_original_data():
-    """Copia datos originales si están disponibles"""
-    print("📊 Verificando datos originales...")
-    
-    # Verificar si existen datos originales
-    original_base = Path("../prueba_tecnica")
-    
-    if not original_base.exists():
-        print("⚠️  Datos originales no encontrados en ../prueba_tecnica")
-        print("   Asegúrate de que los insumos estén disponibles")
-        return False
-    
-    # Copiar archivos si no existen
-    copies_needed = []
-    
-    # Verificar Excel de vehículos
-    vehicles_excel = Path("data/vehicles/carros.xlsx")
-    if not vehicles_excel.exists():
-        original_excel = original_base / "3. Cotizacion" / "funcion_cotizacion" / "data" / "carros.xlsx"
-        if original_excel.exists():
-            copies_needed.append((original_excel, vehicles_excel))
-    
-    # Verificar documentos PDF
-    docs_dir = Path("data/documents")
-    if not any(docs_dir.glob("*.pdf")):
-        original_docs = original_base / "1. Documentos planes autos"
-        if original_docs.exists():
-            for pdf_file in original_docs.glob("*.pdf"):
-                copies_needed.append((pdf_file, docs_dir / pdf_file.name))
-    
-    # Realizar copias
-    if copies_needed:
-        print(f"📋 Copiando {len(copies_needed)} archivos de datos...")
-        for src, dst in copies_needed:
-            try:
-                shutil.copy2(src, dst)
-                print(f"   ✅ {dst.name}")
-            except Exception as e:
-                print(f"   ❌ Error copiando {dst.name}: {e}")
-    else:
-        print("✅ Datos ya están disponibles")
-    
-    return True
 
 def verify_installation():
     """Verifica que la instalación sea correcta"""
@@ -248,19 +306,13 @@ def verify_installation():
     try:
         import subprocess
         
-        # Determinar comando pip
-        if os.name == 'nt':  # Windows
-            pip_cmd = ["venv\\Scripts\\pip"]
-        else:  # Unix/Linux/Mac
-            pip_cmd = ["venv/bin/pip"]
-        
-        # Usar python directo del venv para verificar
-        if os.name == 'nt':  # Windows
-            python_cmd = ["venv\\Scripts\\python"]
-        else:  # Unix/Linux/Mac
-            python_cmd = ["venv/bin/python"]
+        # Usar python del sistema actual
+        python_cmd = [sys.executable]
         
         # Verificar cada paquete crítico
+        available_packages = []
+        missing_packages = []
+        
         for package in critical_packages:
             try:
                 result = subprocess.run(
@@ -271,13 +323,24 @@ def verify_installation():
                 )
                 if result.returncode == 0:
                     print(f"   ✅ {package}")
+                    available_packages.append(package)
                 else:
-                    print(f"   ⚠️  {package} - No disponible en venv")
+                    print(f"   ❌ {package} - No disponible")
+                    missing_packages.append(package)
             except Exception as e:
                 print(f"   ❌ Error verificando {package}: {e}")
-                return False
+                missing_packages.append(package)
         
-        print("📦 Verificación de dependencias en venv completada")
+        print(f"📦 Verificación completada: {len(available_packages)}/{len(critical_packages)} paquetes disponibles")
+        
+        if len(available_packages) >= 4:  # Al menos la mayoría están disponibles
+            print("✅ Suficientes dependencias disponibles para funcionar")
+            if missing_packages:
+                print(f"⚠️  Faltantes (opcionales): {', '.join(missing_packages)}")
+            return True
+        else:
+            print(f"❌ Faltan dependencias críticas: {', '.join(missing_packages)}")
+            return False
         
     except Exception as e:
         print(f"❌ Error verificando dependencias: {e}")
@@ -379,9 +442,9 @@ def main():
     steps = [
         ("Entorno virtual", setup_virtual_environment),
         ("Dependencias", install_dependencies),
+        ("Paquetes problemáticos", install_problematic_packages),
         ("Directorios", setup_directories),
         ("Archivo entorno", setup_environment_file),
-        ("Datos originales", copy_original_data),
         ("Verificación", verify_installation)
     ]
     
