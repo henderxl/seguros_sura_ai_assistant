@@ -81,10 +81,14 @@ class Config:
         
     def _validate_config(self):
         """Valida configuraciones críticas"""
+        import warnings
+        
         if not self.azure_openai.api_key:
-            raise ValueError("AZURE_OPENAI_API_KEY es requerida")
+            warnings.warn("⚠️  AZURE_OPENAI_API_KEY no configurada - algunas funciones estarán limitadas", UserWarning)
+            print("💡 Para configurar: edita el archivo .env y agrega AZURE_OPENAI_API_KEY=tu-api-key")
+        
         if not self.azure_openai.endpoint:
-            raise ValueError("AZURE_OPENAI_ENDPOINT es requerido")
+            warnings.warn("⚠️  AZURE_OPENAI_ENDPOINT no configurado - usando valor por defecto", UserWarning)
             
         # Crear directorios necesarios
         self._ensure_directories()

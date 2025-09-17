@@ -1,61 +1,67 @@
-# Core Dependencies - Versiones validadas funcionando
-langchain>=0.3.0,<0.4.0
-langchain-community>=0.3.0,<0.4.0
-langchain-openai>=0.3.0,<0.4.0
-langchain-core>=0.3.0,<0.4.0
-langchain-text-splitters>=0.3.0,<0.4.0
-langgraph>=0.2.0,<0.3.0
-langsmith>=0.1.0,<0.2.0
+# Core Dependencies 
+langchain==0.3.27
+langchain-core==0.3.75
+langchain-openai==0.3.32
+langchain-text-splitters==0.3.11
+langgraph==0.6.7
+langgraph-checkpoint==2.1.1
+langgraph-prebuilt==0.6.4
+langgraph-sdk==0.2.6
+langsmith==0.4.27
 
-# OpenAI API - Versión actual validada
-openai>=1.100.0,<2.0.0
+# OpenAI API - Versión REAL funcionando
+openai==1.107.0
 
-# Vector Store and Embeddings - Versiones estables funcionando
-chromadb>=1.0.0,<2.0.0
-sentence-transformers>=2.2.0,<3.0.0
+# Vector Store and Embeddings - Versiones REALES funcionando
+chromadb==1.0.20
 
-# Database and Storage - Versiones validadas Python 3.13
-# sqlite3 es built-in en Python
-sqlalchemy>=2.0.0,<3.0.0
-pandas>=2.2.0,<2.3.0  # Versión validada funcionando
-openpyxl>=3.1.0,<4.0.0
+# Database and Storage - Versiones REALES funcionando
+sqlalchemy==2.0.43
+pandas==2.2.3
+openpyxl==3.1.5
 
-# Web Interfaces
-streamlit==1.29.0
-streamlit-chat==0.1.1
-streamlit-authenticator==0.2.3
+# Web Interfaces - Versiones REALES funcionando
+streamlit==1.49.1
 
-# Image Processing and Vision
-pillow==10.2.0
-opencv-python==4.9.0.80
+# Image Processing and Vision - Versiones REALES funcionando
+pillow==11.2.1
+opencv-python==4.11.0.86
 
-# API Integration
-requests==2.31.0
-flask>=3.1.0,<4.0.0
-werkzeug>=3.0.1,<4.0.0
+# API Integration - Versiones REALES funcionando
+requests==2.32.3
+flask==3.1.2
+werkzeug==3.1.3
 
-# Data Processing
-numpy==1.26.2
-python-dateutil==2.8.2
-pytz==2023.3
+# Data Processing - Versiones REALES funcionando
+numpy==2.2.4
+python-dateutil==2.9.0.post0
+pytz==2025.2
 
-# Utilities
-python-dotenv==1.0.0
-pydantic==2.5.2
-tenacity==8.2.3
-tqdm==4.66.1
+# Utilities - Versiones REALES funcionando
+python-dotenv==1.1.0
+pydantic==2.11.5
+tenacity==9.1.2
+tqdm==4.67.1
 
-# Monitoring and Logging
-structlog==23.2.0
-rich==13.7.0
+# Monitoring and Logging - Versiones REALES funcionando
+structlog==25.4.0
+rich==14.1.0
 
-# Development and Testing
-pytest==7.4.3
-pytest-asyncio==0.23.2
-black==23.12.1
-flake8==7.0.0
-mypy==1.8.0
+# Document Processing - Versiones REALES funcionando
+pypdf==6.0.0
+python-multipart==0.0.20
 
-# Document Processing
-pypdf==3.17.4
-python-multipart==0.0.6
+# Dependencies adicionales críticas
+altair==5.5.0
+certifi==2025.4.26
+charset-normalizer==3.4.2
+click==8.2.1
+colorama==0.4.6
+idna==3.10
+jinja2==3.1.6
+markupsafe==3.0.2
+packaging==24.2
+urllib3==2.4.0
+pydantic-core==2.33.2
+typing-extensions==4.14.0
+jsonschema==4.24.0
